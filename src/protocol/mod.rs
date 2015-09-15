@@ -59,7 +59,7 @@ pub enum TypeInfo {
         // a TypeInfo::Int key
         min: i64,
         bits: usize,
-        types: Vec<(&'static str, TypeId)>,
+        types: &'static [(&'static str, TypeId)],
     },
     FourCC,
     Int {
@@ -74,7 +74,7 @@ pub enum TypeInfo {
     Real64,
     Struct {
         // name, type, tag
-        items: Vec<(&'static str, TypeId, i32)>,
+        items: &'static [(&'static str, TypeId, i32)],
     },
 }
 
