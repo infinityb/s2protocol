@@ -2,14 +2,6 @@ import sys
 import ast
 import json
 
-# static TYPEINFOS: &'static [TypeInfo] = &[
-#     TypeInfo::Int { min: 0, bits: 7 },
-#     TypeInfo::Struct {
-#         items: &[
-#             ("aaa", 0, 0),
-#         ]
-#     }
-# ];
 
 class ProtocolDefinition(object):
     def __init__(self, module):
@@ -18,8 +10,12 @@ class ProtocolDefinition(object):
             if isinstance(element, ast.Assign) and len(element.targets) == 1:
                 name = element.targets[0].id
                 assigns[name] = ast.literal_eval(element.value)
+        self._all_assig = assigns
         self.typeinfos = assigns['typeinfos']
         self.game_event_types = assigns['game_event_types']
+        self.message_event_types = assigns['message_event_types']
+        self.game_eventid_typeid = assigns['game_eventid_typeid']
+        self.message_eventid_typeid = assigns['message_eventid_typeid']
 
 
 def load_module(filename):
@@ -52,10 +48,10 @@ def typeinfo_choice_to_rs(bounds, fields):
     yield "TypeInfo::Choice {"
     yield "    min: {},".format(bounds[0])
     yield "    bits: {},".format(bounds[1])
-    yield "    types: &["
-    for field in fields:
-        pass
-    yield "    ]"
+    yield "    types: phf_map! {"
+    for (key, (name, typeid)) in fields.iteritems():
+        yield "        {}_u32 => ({}, {}),".format(key, json.dumps(name), typeid)
+    yield "    },"
     yield "},"
 
 
@@ -112,9 +108,41 @@ typeinfo_to_rs_map = {
 def typeinfo_to_rs(typeinfo):
     return typeinfo_to_rs_map[typeinfo[0]](*typeinfo[1])
 
+
+def game_event_type_to_rs(game_event_type):
+    (gametypeid, (typeid, name)) = game_event_type
+    yield "{}_u32 => ({}, {}),".format(gametypeid, typeid, json.dumps(name))
+
+
 if __name__ == '__main__':
     protocol = load_protocol(sys.argv[1])
-    print('''static TYPEINFOS: &'static [TypeInfo] = &[''')
+
+    print('''use super::TypeInfo;''')
+    print('''use phf::Map as PhfMap;''')
+    print('''''')
+
+    print('''pub static GAME_EVENTID_TYPEID: u32 = {};'''.format(protocol.game_eventid_typeid))
+    print('''''')
+
+    print('''pub static GAME_EVENT_TYPES: PhfMap<u32, (u32, &'static str)> = phf_map! {''')
+    for game_event_type in sorted(protocol.game_event_types.iteritems()):
+        for line in game_event_type_to_rs(game_event_type):
+            print("    {}".format(line))
+    print('''};''')
+    print('''''')
+
+    print('''pub static MESSAGE_EVENTID_TYPEID: u32 = {};'''.format(protocol.message_eventid_typeid))
+    print('''''')
+
+    print('''pub static MESSAGE_EVENT_TYPES: PhfMap<u32, (u32, &'static str)> = phf_map! {''')
+    for game_event_type in sorted(protocol.message_event_types.iteritems()):
+        for line in game_event_type_to_rs(game_event_type):
+            print("    {}".format(line))
+    print('''};''')
+    print('''''')
+
+
+    print('''pub static TYPEINFOS: &'static [TypeInfo] = &[''')
     for typeinfo in protocol.typeinfos:
         for line in typeinfo_to_rs(typeinfo):
             print("    {}".format(line))

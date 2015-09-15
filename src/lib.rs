@@ -8,7 +8,7 @@ extern crate phf_macros;
 
 
 mod mpq;
-mod protocol;
+pub mod protocol;
 pub use self::protocol::get_protocol;
 
 #[test]

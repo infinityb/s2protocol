@@ -1,9 +1,39 @@
 use std::io::{self};
 use std::collections::HashMap;
+use phf::Map as PhfMap;
 
-mod protocol15405;
+pub mod protocol15405;
 
-type TypeId = u32;
+mod protocol15405_def;
+mod protocol16561_def;
+mod protocol16605_def;
+mod protocol16755_def;
+mod protocol16939_def;
+mod protocol17266_def;
+mod protocol17326_def;
+mod protocol18092_def;
+mod protocol18468_def;
+mod protocol18574_def;
+mod protocol19132_def;
+mod protocol19458_def;
+mod protocol19595_def;
+mod protocol19679_def;
+mod protocol21029_def;
+mod protocol21995_def;
+mod protocol22612_def;
+mod protocol23260_def;
+mod protocol24764_def;
+mod protocol24944_def;
+mod protocol26490_def;
+mod protocol27950_def;
+mod protocol28272_def;
+mod protocol28667_def;
+mod protocol32283_def;
+mod protocol34784_def;
+mod protocol34835_def;
+mod protocol36442_def;
+
+pub type TypeId = u32;
 
 use self::protocol15405::Protocol15405;
 
@@ -59,7 +89,7 @@ pub enum TypeInfo {
         // a TypeInfo::Int key
         min: i64,
         bits: usize,
-        types: &'static [(&'static str, TypeId)],
+        types: PhfMap<u32, (&'static str, TypeId)>,
     },
     FourCC,
     Int {
@@ -133,7 +163,7 @@ pub struct BitPackedCursor {
 }
 
 impl BitPackedCursor {
-    fn read_array(&mut self) -> Result<Vec<Value>, ()> {
+    fn read_array(&mut self, tid: TypeId) -> Result<Vec<Value>, ()> {
         let length = try!(self.read_int());
         let mut out = Vec::with_capacity(length as usize);
         for _ in 0..length {
@@ -142,15 +172,15 @@ impl BitPackedCursor {
         Ok(out)
     }
 
-    fn read_instance(&mut self) -> Result<Value, ()> {
+    fn read_instance(&mut self, tid: TypeId) -> Result<Value, ()> {
         unimplemented!();
     }
 
-    fn read_int(&mut self) -> Result<i64, ()> {
+    fn read_int(&mut self, tid: TypeId) -> Result<i64, ()> {
         unimplemented!();
     }
 
-    fn read_struct(&mut self) -> Result<HashMap<&'static str, Value>, ()> {
+    fn read_struct(&mut self, tid: TypeId) -> Result<HashMap<&'static str, Value>, ()> {
         unimplemented!();
     }
 }
