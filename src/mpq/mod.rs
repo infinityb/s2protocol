@@ -1,6 +1,10 @@
 use std::num::Wrapping;
 use std::io::{self, Read, Cursor, Seek, SeekFrom};
+use std::sync::{Once, ONCE_INIT};
 use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
+
+mod enctable;
+use self::enctable::ENCRYPTION_TABLE;
 
 static MPQ_FILE_IMPLODE: u32 = 0x00000100;
 static MPQ_FILE_COMPRESS: u32 = 0x00000200;
@@ -10,8 +14,6 @@ static MPQ_FILE_SINGLE_UNIT: u32 = 0x01000000;
 static MPQ_FILE_DELETE_MARKER: u32 = 0x02000000;
 static MPQ_FILE_SECTOR_CRC: u32 = 0x04000000;
 static MPQ_FILE_EXISTS: u32 = 0x80000000;
-
-
 
 const MPQ_HEADER_FILE_MAGIC: u32 = 0x4d50511a;
 const MPQ_HEADER_USER_DATA_MAGIC: u32 = 0x4d50511b;
@@ -77,13 +79,11 @@ impl<R> MpqArchive<R> where R: Read+Seek {
         if table_offset != 205652 { panic!("bad offset {}", table_offset) }
         let table_entries = self.header.hash_table_entries;
 
-        let encryption_table = prepare_encryption_table();
-
         let mut buffer = vec![0; 16 * table_entries as usize];
         try!(self.file.seek(SeekFrom::Start(table_offset as u64)));
         try!(read_exact(&mut self.file, &mut buffer));
-        let key = string_hash(encryption_table, b"(hash table)", "TABLE");
-        decrypt(encryption_table, key, &mut buffer);
+        let key = string_hash(ENCRYPTION_TABLE, b"(hash table)", StringHashType::Table);
+        decrypt(ENCRYPTION_TABLE, key, &mut buffer);
 
         let mut entry_rdr = Cursor::new(&buffer[..]);
         let mut out = Vec::with_capacity(table_entries as usize);
@@ -98,13 +98,11 @@ impl<R> MpqArchive<R> where R: Read+Seek {
         if table_offset != 205908 { panic!("bad offset {}", table_offset) }
         let table_entries = self.header.block_table_entries;
 
-        let encryption_table = prepare_encryption_table();
-
         let mut buffer = vec![0; 16 * table_entries as usize];
         try!(self.file.seek(SeekFrom::Start(table_offset as u64)));
         try!(read_exact(&mut self.file, &mut buffer));
-        let key = string_hash(encryption_table, b"(block table)", "TABLE");
-        decrypt(encryption_table, key, &mut buffer);
+        let key = string_hash(ENCRYPTION_TABLE, b"(block table)", StringHashType::Table);
+        decrypt(ENCRYPTION_TABLE, key, &mut buffer);
 
         let mut entry_rdr = Cursor::new(&buffer[..]);
         let mut out = Vec::with_capacity(table_entries as usize);
@@ -237,25 +235,6 @@ impl MpqBlockTableEntry {
     }
 }
 
-fn prepare_encryption_table() -> [Wrapping<u32>; 1280] {
-    let mut seed = 0x00100001;
-    let mut crypt_table: [Wrapping<u32>; 1280] = [Wrapping(0); 1280];
-
-    let mut index;
-    for i in 0..256 {
-        index = i;
-        for _ in 0..5 {
-            seed = (seed * 125 + 3) % 0x2AAAAB;
-            let temp1 = (seed & 0xFFFF) << 0x10;
-            seed = (seed * 125 + 3) % 0x2AAAAB;
-            let temp2 = seed & 0xFFFF;
-            crypt_table[index] = Wrapping(temp1 | temp2);
-            index += 0x100;
-        }
-    }
-    crypt_table
-}
-
 fn decrypt(table: [Wrapping<u32>; 1280], key: u32, buf: &mut [u8]) {
     // Obviously, this could be optimised and alloc-free
 
@@ -284,31 +263,35 @@ fn decrypt(table: [Wrapping<u32>; 1280], key: u32, buf: &mut [u8]) {
     ::std::slice::bytes::copy_memory(&tmp, buf);
 }
 
-fn string_hash(table: [Wrapping<u32>; 1280], string: &[u8], hash_type: &'static str) -> u32 {
-    // Please forgive this atrocity
-    let hash_tynum: u32 = match hash_type {
-        "TABLE_OFFSET" => 0,
-        "HASH_A" => 1,
-        "HASH_B" => 2,
-        "TABLE" => 3,
-        _ => panic!(),
-    };
+enum StringHashType {
+    TableOffset = 0,
+    HashA = 1,
+    HashB = 2,
+    Table = 3,
+}
 
-    let mut seed1: Wrapping<u32> = Wrapping(0x7FED7FED);
-    let mut seed2: Wrapping<u32> = Wrapping(0xEEEEEEEE);
+fn string_hash_normalize(ch: u8) -> Wrapping<u32> {
+    if b'a' <= ch && ch <= b'z' {
+        Wrapping((ch - b'a' + b'A') as u32)
+    } else {
+        Wrapping(ch as u32)
+    }
+}
 
-    for mut ch in string.iter().cloned() {
-        if b'a' <= ch && ch <= b'z' {
-            ch = ch - b'a' + b'A';
-        }
-        let ch = ch as u32;
-        let tab_idx = ((hash_tynum << 8) + ch) as usize;
-        seed1 = table[tab_idx] ^ (seed1 + seed2);
-        seed2 = Wrapping(ch) + seed1 + seed2 + (seed2 << 5) + Wrapping(3);
+fn string_hash(table: [Wrapping<u32>; 1280], string: &[u8], hash_type: StringHashType) -> u32 {
+    let hash_tynum: u32 = hash_type as u32;
+
+    let mut seed1 = Wrapping(0x7FED7FED);
+    let mut seed2 = Wrapping(0xEEEEEEEE);
+
+    for ch in string.iter().cloned().map(string_hash_normalize) {
+        let tab_idx = ((hash_tynum << 8) + ch.0) as usize;
+        let sum = seed1 + seed2;
+        seed1 = table[tab_idx] ^ sum;
+        seed2 = ch + sum + (seed2 << 5) + Wrapping(3);
     }
 
-    let Wrapping(out) = seed1;
-    out
+    seed1.0
 }
 
 #[cfg(test)]
@@ -316,7 +299,7 @@ mod tests {
     use std::io::Cursor;
     use super::{MpqArchive, MpqBlockTableEntry, MpqHashTableEntry};
 
-    static SC2_REPLAY: &'static [u8] = include_bytes!("../testdata/test.SC2Replay");
+    static SC2_REPLAY: &'static [u8] = include_bytes!("../../testdata/test.SC2Replay");
 
     #[test]
     fn test_header_reader() {
