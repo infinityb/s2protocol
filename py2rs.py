@@ -10,12 +10,7 @@ class ProtocolDefinition(object):
             if isinstance(element, ast.Assign) and len(element.targets) == 1:
                 name = element.targets[0].id
                 assigns[name] = ast.literal_eval(element.value)
-        self._all_assig = assigns
-        self.typeinfos = assigns['typeinfos']
-        self.game_event_types = assigns['game_event_types']
-        self.message_event_types = assigns['message_event_types']
-        self.game_eventid_typeid = assigns['game_eventid_typeid']
-        self.message_eventid_typeid = assigns['message_eventid_typeid']
+        self.__dict__.update(assigns)
 
 
 def load_module(filename):
@@ -118,6 +113,9 @@ if __name__ == '__main__':
 
     print('''use super::{TypeInfo, IntBounds};''')
     print('''use phf::Map as PhfMap;''')
+    print('''''')
+
+    print('''pub static REPLAY_HEADER_TYPEID: u32 = {};'''.format(protocol.replay_header_typeid))
     print('''''')
 
     print('''pub static GAME_EVENTID_TYPEID: u32 = {};'''.format(protocol.game_eventid_typeid))

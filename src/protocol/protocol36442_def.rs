@@ -1,6 +1,8 @@
 use super::{TypeInfo, IntBounds};
 use phf::Map as PhfMap;
 
+pub static REPLAY_HEADER_TYPEID: u32 = 18;
+
 pub static GAME_EVENTID_TYPEID: u32 = 0;
 
 pub static GAME_EVENT_TYPES: PhfMap<u32, (u32, &'static str)> = phf_map! {

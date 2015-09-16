@@ -279,20 +279,20 @@ fn string_hash_normalize(ch: u8) -> Wrapping<u32> {
 }
 
 fn string_hash(table: [Wrapping<u32>; 1280], string: &[u8], hash_type: StringHashType) -> u32 {
+    // Please forgive this atrocity
     let hash_tynum: u32 = hash_type as u32;
-
     let mut seed1 = Wrapping(0x7FED7FED);
     let mut seed2 = Wrapping(0xEEEEEEEE);
 
-    for ch in string.iter().cloned().map(string_hash_normalize) {
+    for mut ch in string.iter().cloned().map(string_hash_normalize) {
         let tab_idx = ((hash_tynum << 8) + ch.0) as usize;
-        let sum = seed1 + seed2;
-        seed1 = table[tab_idx] ^ sum;
-        seed2 = ch + sum + (seed2 << 5) + Wrapping(3);
+        seed1 = table[tab_idx] ^ (seed1 + seed2);
+        seed2 = ch + seed1 + seed2 + (seed2 << 5) + Wrapping(3);
     }
 
     seed1.0
 }
+
 
 #[cfg(test)]
 mod tests {

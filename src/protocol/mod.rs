@@ -2,6 +2,7 @@ use std::io::{self};
 use std::collections::HashMap;
 use phf::Map as PhfMap;
 
+mod decoders;
 pub mod protocol15405;
 
 mod protocol15405_def;
@@ -36,10 +37,19 @@ mod protocol36442_def;
 pub type TypeId = u32;
 
 use self::protocol15405::Protocol15405;
+pub use self::decoders::{Value, InstanceReader};
+pub use self::decoders::{
+    ArrayReader,
+    FourCcReader,
+    Float32Reader,
+    Float64Reader,
+    StructReader,
+    IntegerReader,
+};
 
-pub enum Unknown {}
+pub enum ReplayHeader {}
 
-pub enum InitData {}
+pub enum ReplayInitData {}
 
 pub enum ReplayDetails {}
 
@@ -50,21 +60,6 @@ pub enum ReplayMessageEvents {}
 pub enum ReplayTrackerEvents {}
 
 pub enum ReplayAttributesEvents {}
-
-pub enum Value {
-    Array(Vec<Value>),
-    BitArray(Unknown),
-    Blob(Vec<u8>),
-    Bool(bool),
-    Choice(&'static str, Box<Value>),
-    FourCC([u8; 4]),
-    Int(i64),
-    Null,
-    Optional(Option<Box<Value>>),
-    Real32(f32),
-    Real64(f64),
-    Struct(HashMap<&'static str, Value>),
-}
 
 pub type ChoiceTypeMap = PhfMap<u32, (&'static str, TypeId)>;
 
@@ -102,10 +97,21 @@ pub enum TypeInfo {
     },
 }
 
+// impl TypeInfo {
+//     fn to_instance_reader(&self) -> Result<Box<IR>, ()> where IR: InstanceReader {
+//         match *self {
+//             TypeInfo::Struct { ref fields } => Box::new(StructReader::new(fields)),
+//             _ => unimplemented!(),
+//         }
+//     }
+// }
+
 pub trait Protocol {
     fn protocol_num(&self) -> u32;
 
-    fn decode_replay_initdata(&self, rdr: &mut io::Read) -> io::Result<InitData>;
+    fn decode_replay_header(&self, rdr: &mut io::Read) -> io::Result<ReplayHeader>;
+
+    fn decode_replay_initdata(&self, rdr: &mut io::Read) -> io::Result<ReplayInitData>;
 
     fn decode_replay_details(&self, rdr: &mut io::Read) -> io::Result<ReplayDetails>;
 
@@ -178,7 +184,11 @@ impl<'a> BitPackedCursor<'a> {
         unimplemented!();
     }
 
-    fn read_aligned_bytes(self, len: usize) -> Result<Vec<u8>, MpqError> {
+    fn read_unaligned_bytes(&mut self, into: &mut [u8]) -> Result<usize, MpqError> {
+        unimplemented!();
+    }
+
+    fn read_aligned_bytes(&mut self, into: &mut [u8]) -> Result<usize, MpqError> {
         unimplemented!();
     }
 }
@@ -189,7 +199,11 @@ struct BitPackedDecoder<'a> {
 }
 
 impl<'a> BitPackedDecoder<'a> {
-    fn read_instance(&mut self, tid: TypeId) -> Result<Value, MpqError> {
+    pub fn read_instance<IR>(&mut self, ir: &IR) -> Result<IR::Item, MpqError> where IR: InstanceReader {
+        unimplemented!();
+    }
+
+    pub fn read_value(&mut self, tid: TypeId) -> Result<Value, MpqError> {
         let typeinfo = try!(self.typeinfos
             .get(tid as usize)
             .ok_or(MpqError::Corrupted));
@@ -240,60 +254,71 @@ impl<'a> BitPackedDecoder<'a> {
             }
         }
     }
-
-    fn read_array(&mut self, bounds: IntBounds, tid: TypeId) -> Result<Vec<Value>, MpqError> {
-        let length = try!(self.read_int(bounds));
-        let mut out = Vec::with_capacity(length as usize);
-        for _ in 0..length {
-            out.push(try!(self.read_instance(tid)));
-        }
-        Ok(out)
-    }
-
-    fn read_bitarray(&self, bounds: IntBounds) -> Result<(), MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_blob(&self, bounds: IntBounds) -> Result<Vec<u8>, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_bool(&self) -> Result<bool, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_choice(&self, bounds: IntBounds, fields: &ChoiceTypeMap) -> Result<(&'static str, Value), MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_fourcc(&self) -> Result<[u8; 4], MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_int(&self, bounds: IntBounds) -> Result<i64, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_null(&self) -> Result<(), MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_optional(&self, tid: TypeId) -> Result<Option<Value>, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_real32(&self) -> Result<f32, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_real64(&self) -> Result<f64, MpqError> {
-        unimplemented!();
-    }
-    
-    fn read_struct(&self, fields: &[StructField]) -> Result<HashMap<&'static str, Value>, MpqError> {
-        unimplemented!();
-    }
 }
+
+// impl<'a> BitPackedDecoder<'a> { 
+//     fn read_array<IR>(&mut self, bounds: IntBounds) -> Result<Vec<IR::Item>, MpqError> where IR: InstanceReader {
+//         let length = try!(self.read_int(bounds));
+//         let mut out = Vec::with_capacity(length as usize);
+//         for _ in 0..length {
+//             out.push(try!(self.read_instance()));
+//         }
+//         Ok(out)
+//     }
+
+//     fn read_array_val(&mut self, bounds: IntBounds, tid: TypeId) -> Result<Vec<Value>, MpqError> {
+//         let length = try!(self.read_int(bounds));
+//         let mut out = Vec::with_capacity(length as usize);
+//         for _ in 0..length {
+//             out.push(try!(self.read_value(tid)));
+//         }
+//         Ok(out)
+//     }
+
+//     fn read_bitarray(&self, bounds: IntBounds) -> Result<(), MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_blob(&self, bounds: IntBounds) -> Result<Vec<u8>, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_bool(&self) -> Result<bool, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_choice(&self, bounds: IntBounds, fields: &ChoiceTypeMap) -> Result<(&'static str, Value), MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_fourcc(&self) -> Result<[u8; 4], MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_int(&self, bounds: IntBounds) -> Result<i64, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_null(&self) -> Result<(), MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_optional(&self, tid: TypeId) -> Result<Option<Value>, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_real32(&self) -> Result<f32, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_real64(&self) -> Result<f64, MpqError> {
+//         unimplemented!();
+//     }
+    
+//     fn read_struct(&self, fields: &[StructField]) -> Result<HashMap<&'static str, Value>, MpqError> {
+//         unimplemented!();
+//     }
+// }
 
 pub struct VersionedDecoder<'a> {
     buffer: BitPackedCursor<'a>,

@@ -1,23 +1,23 @@
 use std::num::Wrapping as W;
 
-// fn prepare_encryption_table() -> [Wrapping<u32>; 1280] {
-//     let mut seed = 0x00100001;
-//     let mut crypt_table: [Wrapping<u32>; 1280] = [Wrapping(0); 1280];
-//
-//     let mut index;
-//     for i in 0..256 {
-//         index = i;
-//         for _ in 0..5 {
-//             seed = (seed * 125 + 3) % 0x2AAAAB;
-//             let temp1 = (seed & 0xFFFF) << 0x10;
-//             seed = (seed * 125 + 3) % 0x2AAAAB;
-//             let temp2 = seed & 0xFFFF;
-//             crypt_table[index] = Wrapping(temp1 | temp2);
-//             index += 0x100;
-//         }
-//     }
-//     crypt_table
-// }
+pub fn prepare_encryption_table() -> [W<u32>; 1280] {
+    let mut seed = 0x00100001;
+    let mut crypt_table: [W<u32>; 1280] = [W(0); 1280];
+
+    let mut index;
+    for i in 0..256 {
+        index = i;
+        for _ in 0..5 {
+            seed = (seed * 125 + 3) % 0x2AAAAB;
+            let temp1 = (seed & 0xFFFF) << 0x10;
+            seed = (seed * 125 + 3) % 0x2AAAAB;
+            let temp2 = seed & 0xFFFF;
+            crypt_table[index] = W(temp1 | temp2);
+            index += 0x100;
+        }
+    }
+    crypt_table
+}
 
 pub static ENCRYPTION_TABLE: [W<u32>; 1280] = [
     W(0x55c636e2), W(0x02be0170), W(0x584b71d4), W(0x2984f00e),
