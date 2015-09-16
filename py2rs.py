@@ -27,16 +27,16 @@ def load_protocol(filename):
 
 
 def typeinfo_array_to_rs(bounds, typeid):
-    yield "TypeInfo::Array {{ bounds: ({}, {}), typeid: {} }},".\
+    yield "TypeInfo::Array {{ bounds: IntBounds {{ min: {}, bitlen: {} }}, typeid: {} }},".\
         format(bounds[0], bounds[1], typeid)
 
 
 def typeinfo_bitarray_to_rs(bounds):
-    yield "TypeInfo::BitArray {{ len_min: {}, len_bits: {} }},".\
+    yield "TypeInfo::BitArray {{ len: IntBounds {{ min: {}, bitlen: {} }} }},".\
         format(bounds[0], bounds[1])
 
 def typeinfo_blob_to_rs(bounds):
-    yield "TypeInfo::Blob {{ len_min: {}, len_bits: {} }},".\
+    yield "TypeInfo::Blob {{ len: IntBounds {{ min: {}, bitlen: {} }} }},".\
         format(bounds[0], bounds[1])
 
 
@@ -46,8 +46,7 @@ def typeinfo_bool_to_rs():
 
 def typeinfo_choice_to_rs(bounds, fields):
     yield "TypeInfo::Choice {"
-    yield "    min: {},".format(bounds[0])
-    yield "    bits: {},".format(bounds[1])
+    yield "    bounds: IntBounds {{ min: {}, bitlen: {} }},".format(*bounds)
     yield "    types: phf_map! {"
     for (key, (name, typeid)) in fields.iteritems():
         yield "        {}_u32 => ({}, {}),".format(key, json.dumps(name), typeid)
@@ -60,7 +59,7 @@ def typeinfo_fourcc_to_rs():
 
 
 def typeinfo_int_to_rs(bounds):
-    yield "TypeInfo::Int {{ min: {}, bits: {} }},".\
+    yield "TypeInfo::Int {{ bounds: IntBounds {{ min: {}, bitlen: {} }} }},".\
         format(bounds[0], bounds[1])
 
 
@@ -83,7 +82,7 @@ def typeinfo_real64_to_rs(args):
 
 def typeinfo_struct_to_rs(fields):
     yield "TypeInfo::Struct {"
-    yield "    items: &["
+    yield "    fields: &["
     for (name, typeid, tag) in fields:
         yield "        ({}, {}, {}),".format(json.dumps(name), typeid, tag)
     yield "    ],"
@@ -117,7 +116,7 @@ def game_event_type_to_rs(game_event_type):
 if __name__ == '__main__':
     protocol = load_protocol(sys.argv[1])
 
-    print('''use super::TypeInfo;''')
+    print('''use super::{TypeInfo, IntBounds};''')
     print('''use phf::Map as PhfMap;''')
     print('''''')
 

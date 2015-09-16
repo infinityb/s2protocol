@@ -1,4 +1,4 @@
-use super::TypeInfo;
+use super::{TypeInfo, IntBounds};
 use phf::Map as PhfMap;
 
 pub static GAME_EVENTID_TYPEID: u32 = 0;
@@ -113,16 +113,15 @@ pub static MESSAGE_EVENT_TYPES: PhfMap<u32, (u32, &'static str)> = phf_map! {
 };
 
 pub static TYPEINFOS: &'static [TypeInfo] = &[
-    TypeInfo::Int { min: 0, bits: 7 },
-    TypeInfo::Int { min: 0, bits: 4 },
-    TypeInfo::Int { min: 0, bits: 5 },
-    TypeInfo::Int { min: 0, bits: 6 },
-    TypeInfo::Int { min: 0, bits: 14 },
-    TypeInfo::Int { min: 0, bits: 22 },
-    TypeInfo::Int { min: 0, bits: 32 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 7 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 4 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 5 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 6 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 14 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 22 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 32 } },
     TypeInfo::Choice {
-        min: 0,
-        bits: 2,
+        bounds: IntBounds { min: 0, bitlen: 2 },
         types: phf_map! {
             0_u32 => ("m_uint6", 3),
             1_u32 => ("m_uint14", 4),
@@ -131,14 +130,14 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         },
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_userId", 2, -1),
         ],
     },
-    TypeInfo::Blob { len_min: 0, len_bits: 8 },
-    TypeInfo::Int { min: 0, bits: 8 },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 8 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 8 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_flags", 10, 0),
             ("m_major", 10, 1),
             ("m_minor", 10, 2),
@@ -147,19 +146,19 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_baseBuild", 6, 5),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 3 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 3 } },
     TypeInfo::Bool,
-    TypeInfo::Array { bounds: (16, 0), typeid: 10 },
+    TypeInfo::Array { bounds: IntBounds { min: 16, bitlen: 0 }, typeid: 10 },
     TypeInfo::Optional { typeid: 14 },
-    TypeInfo::Blob { len_min: 16, len_bits: 0 },
+    TypeInfo::Blob { len: IntBounds { min: 16, bitlen: 0 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_dataDeprecated", 15, 0),
             ("m_data", 16, 1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_signature", 9, 0),
             ("m_version", 11, 1),
             ("m_type", 12, 2),
@@ -170,10 +169,10 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::FourCC,
-    TypeInfo::Blob { len_min: 0, len_bits: 7 },
-    TypeInfo::Int { min: 0, bits: 64 },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 7 } },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 64 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_region", 10, 0),
             ("m_programId", 19, 1),
             ("m_realm", 6, 2),
@@ -182,17 +181,17 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_a", 10, 0),
             ("m_r", 10, 1),
             ("m_g", 10, 2),
             ("m_b", 10, 3),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 2 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 2 } },
     TypeInfo::Optional { typeid: 10 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_name", 9, 0),
             ("m_toon", 22, 1),
             ("m_race", 9, 2),
@@ -206,25 +205,25 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_hero", 9, 10),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 26 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 26 },
     TypeInfo::Optional { typeid: 27 },
-    TypeInfo::Blob { len_min: 0, len_bits: 10 },
-    TypeInfo::Blob { len_min: 0, len_bits: 11 },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 10 } },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 11 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_file", 30, 0),
         ],
     },
     TypeInfo::Optional { typeid: 13 },
-    TypeInfo::Int { min: -9223372036854775808, bits: 64 },
-    TypeInfo::Blob { len_min: 0, len_bits: 12 },
-    TypeInfo::Blob { len_min: 40, len_bits: 0 },
-    TypeInfo::Array { bounds: (0, 6), typeid: 35 },
+    TypeInfo::Int { bounds: IntBounds { min: -9223372036854775808, bitlen: 64 } },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 12 } },
+    TypeInfo::Blob { len: IntBounds { min: 40, bitlen: 0 } },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 6 }, typeid: 35 },
     TypeInfo::Optional { typeid: 36 },
-    TypeInfo::Array { bounds: (0, 6), typeid: 30 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 6 }, typeid: 30 },
     TypeInfo::Optional { typeid: 38 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_playerList", 28, 0),
             ("m_title", 29, 1),
             ("m_difficulty", 9, 2),
@@ -248,18 +247,18 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
     TypeInfo::Optional { typeid: 35 },
     TypeInfo::Optional { typeid: 6 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_race", 25, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_team", 25, -1),
         ],
     },
-    TypeInfo::Blob { len_min: 0, len_bits: 9 },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 9 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_name", 9, -18),
             ("m_clanTag", 41, -17),
             ("m_clanLogo", 42, -16),
@@ -280,9 +279,9 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_toonHandle", 20, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 47 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 47 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_lockTeams", 13, -16),
             ("m_teamsTogether", 13, -15),
             ("m_advancedSharedControl", 13, -14),
@@ -301,14 +300,14 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_clientDebugFlags", 21, -1),
         ],
     },
-    TypeInfo::Int { min: 1, bits: 4 },
-    TypeInfo::Int { min: 1, bits: 8 },
-    TypeInfo::BitArray { len_min: 0, len_bits: 6 },
-    TypeInfo::BitArray { len_min: 0, len_bits: 8 },
-    TypeInfo::BitArray { len_min: 0, len_bits: 2 },
-    TypeInfo::BitArray { len_min: 0, len_bits: 7 },
+    TypeInfo::Int { bounds: IntBounds { min: 1, bitlen: 4 } },
+    TypeInfo::Int { bounds: IntBounds { min: 1, bitlen: 8 } },
+    TypeInfo::BitArray { len: IntBounds { min: 0, bitlen: 6 } },
+    TypeInfo::BitArray { len: IntBounds { min: 0, bitlen: 8 } },
+    TypeInfo::BitArray { len: IntBounds { min: 0, bitlen: 2 } },
+    TypeInfo::BitArray { len: IntBounds { min: 0, bitlen: 7 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_allowedColors", 52, -6),
             ("m_allowedRaces", 53, -5),
             ("m_allowedDifficulty", 52, -4),
@@ -317,9 +316,9 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_allowedAIBuilds", 55, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 56 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 56 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_randomValue", 6, -26),
             ("m_gameCacheName", 29, -25),
             ("m_gameOptions", 49, -24),
@@ -351,15 +350,15 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
     TypeInfo::Optional { typeid: 1 },
     TypeInfo::Optional { typeid: 2 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_color", 60, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 4), typeid: 46 },
-    TypeInfo::Array { bounds: (0, 17), typeid: 6 },
-    TypeInfo::Array { bounds: (0, 9), typeid: 6 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 4 }, typeid: 46 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 17 }, typeid: 6 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 9 }, typeid: 6 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_control", 10, -21),
             ("m_userId", 59, -20),
             ("m_teamId", 1, -19),
@@ -383,9 +382,9 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_commanderLevel", 6, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 65 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 65 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_phase", 12, -11),
             ("m_maxUsers", 2, -10),
             ("m_maxObservers", 2, -9),
@@ -400,51 +399,51 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_userInitialData", 48, -3),
             ("m_gameDescription", 58, -2),
             ("m_lobbyState", 67, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_syncLobbyState", 68, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_name", 20, -1),
         ],
     },
-    TypeInfo::Blob { len_min: 0, len_bits: 6 },
+    TypeInfo::Blob { len: IntBounds { min: 0, bitlen: 6 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_name", 71, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_name", 71, -3),
             ("m_type", 6, -2),
             ("m_data", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_type", 6, -3),
             ("m_name", 71, -2),
             ("m_data", 34, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 10 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 10 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_signature", 75, -2),
             ("m_toonHandle", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_gameFullyDownloaded", 13, -15),
             ("m_developmentCheatsEnabled", 13, -14),
             ("m_testCheatsEnabled", 13, -13),
@@ -463,24 +462,24 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
         ],
     },
-    TypeInfo::Int { min: 0, bits: 16 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 16 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("x", 79, -2),
             ("y", 79, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_which", 12, -2),
             ("m_target", 80, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_fileName", 30, -5),
             ("m_automatic", 13, -4),
             ("m_overwrite", 13, -3),
@@ -489,19 +488,19 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_sequence", 6, -1),
         ],
     },
-    TypeInfo::Int { min: -2147483648, bits: 32 },
+    TypeInfo::Int { bounds: IntBounds { min: -2147483648, bitlen: 32 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("x", 84, -2),
             ("y", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_point", 85, -4),
             ("m_time", 84, -3),
             ("m_verb", 29, -2),
@@ -509,13 +508,13 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_data", 86, -1),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 23 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 23 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_abilLink", 79, -3),
             ("m_abilCmdIndex", 2, -2),
             ("m_abilCmdData", 25, -1),
@@ -523,16 +522,16 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
     },
     TypeInfo::Optional { typeid: 89 },
     TypeInfo::Null,
-    TypeInfo::Int { min: 0, bits: 20 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 20 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("x", 92, -3),
             ("y", 92, -2),
             ("z", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_targetUnitFlags", 79, -7),
             ("m_timer", 10, -6),
             ("m_tag", 6, -5),
@@ -543,8 +542,7 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Choice {
-        min: 0,
-        bits: 2,
+        bounds: IntBounds { min: 0, bitlen: 2 },
         types: phf_map! {
             0_u32 => ("None", 91),
             1_u32 => ("TargetPoint", 93),
@@ -552,9 +550,9 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             3_u32 => ("Data", 6),
         },
     },
-    TypeInfo::Int { min: 1, bits: 32 },
+    TypeInfo::Int { bounds: IntBounds { min: 1, bitlen: 32 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cmdFlags", 88, -6),
             ("m_abil", 90, -5),
             ("m_data", 95, -4),
@@ -563,12 +561,11 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_unitGroup", 43, -1),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 9 },
-    TypeInfo::BitArray { len_min: 0, len_bits: 9 },
-    TypeInfo::Array { bounds: (0, 9), typeid: 98 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 9 } },
+    TypeInfo::BitArray { len: IntBounds { min: 0, bitlen: 9 } },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 9 }, typeid: 98 },
     TypeInfo::Choice {
-        min: 0,
-        bits: 2,
+        bounds: IntBounds { min: 0, bitlen: 2 },
         types: phf_map! {
             0_u32 => ("None", 91),
             1_u32 => ("Mask", 99),
@@ -577,16 +574,16 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         },
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitLink", 79, -4),
             ("m_subgroupPriority", 10, -3),
             ("m_intraSubgroupPriority", 10, -2),
             ("m_count", 98, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 9), typeid: 102 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 9 }, typeid: 102 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_subgroupIndex", 98, -4),
             ("m_removeMask", 101, -3),
             ("m_addSubgroups", 103, -2),
@@ -594,20 +591,20 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_controlGroupId", 1, -2),
             ("m_delta", 104, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_controlGroupIndex", 1, -3),
             ("m_controlGroupUpdate", 12, -2),
             ("m_mask", 101, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_count", 98, -6),
             ("m_subgroupCount", 98, -5),
             ("m_activeSubgroupIndex", 98, -4),
@@ -617,33 +614,33 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_controlGroupId", 1, -2),
             ("m_selectionSyncData", 107, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 3), typeid: 84 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 3 }, typeid: 84 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_recipientId", 1, -2),
             ("m_resources", 109, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_chatMessage", 29, -1),
         ],
     },
-    TypeInfo::Int { min: -128, bits: 8 },
+    TypeInfo::Int { bounds: IntBounds { min: -128, bitlen: 8 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("x", 84, -3),
             ("y", 84, -2),
             ("z", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_beacon", 112, -9),
             ("m_ally", 112, -8),
             ("m_flags", 112, -7),
@@ -656,17 +653,17 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_speed", 12, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_delta", 112, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_point", 85, -4),
             ("m_unit", 6, -3),
             ("m_pingedMinimap", 13, -2),
@@ -674,37 +671,37 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_verb", 29, -2),
             ("m_arguments", 29, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_alliance", 6, -2),
             ("m_control", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTag", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTag", 6, -2),
             ("m_flags", 10, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_conversationId", 84, -2),
             ("m_replyId", 84, -1),
         ],
     },
     TypeInfo::Optional { typeid: 20 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_gameUserId", 1, -6),
             ("m_observe", 24, -5),
             ("m_name", 9, -4),
@@ -713,27 +710,26 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
             ("m_clanLogo", 42, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 5), typeid: 124 },
-    TypeInfo::Int { min: 0, bits: 1 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 5 }, typeid: 124 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 1 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_userInfos", 125, -2),
             ("m_method", 126, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_purchaseItemId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_difficultyLevel", 84, -1),
         ],
     },
     TypeInfo::Choice {
-        min: 0,
-        bits: 3,
+        bounds: IntBounds { min: 0, bitlen: 3 },
         types: phf_map! {
             0_u32 => ("None", 91),
             1_u32 => ("Checked", 13),
@@ -744,61 +740,61 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         },
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_controlId", 84, -3),
             ("m_eventType", 84, -2),
             ("m_eventData", 130, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_soundHash", 6, -2),
             ("m_length", 6, -1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 7), typeid: 6 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 7 }, typeid: 6 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_soundHash", 133, -2),
             ("m_length", 133, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_syncInfo", 134, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_queryId", 79, -3),
             ("m_lengthMs", 6, -2),
             ("m_finishGameLoop", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_queryId", 79, -2),
             ("m_lengthMs", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_animWaitQueryId", 79, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_sound", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_transmissionId", 84, -2),
             ("m_thread", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_transmissionId", 84, -1),
         ],
     },
@@ -806,7 +802,7 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
     TypeInfo::Optional { typeid: 79 },
     TypeInfo::Optional { typeid: 112 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_target", 142, -6),
             ("m_distance", 143, -5),
             ("m_pitch", 143, -4),
@@ -816,19 +812,19 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_skipType", 126, -1),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 11 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 11 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("x", 147, -2),
             ("y", 147, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_button", 6, -5),
             ("m_down", 13, -4),
             ("m_posUI", 148, -3),
@@ -837,149 +833,149 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_posUI", 148, -3),
             ("m_posWorld", 93, -2),
             ("m_flags", 112, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_achievementLink", 79, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_hotkey", 6, -2),
             ("m_down", 13, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_abilLink", 79, -3),
             ("m_abilCmdIndex", 2, -2),
             ("m_state", 112, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_soundtrack", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_planetId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_key", 112, -2),
             ("m_flags", 112, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_resources", 109, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_fulfillRequestId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cancelRequestId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_researchItemId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_mercenaryId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_battleReportId", 84, -2),
             ("m_difficultyLevel", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_battleReportId", 84, -1),
         ],
     },
-    TypeInfo::Int { min: 0, bits: 19 },
+    TypeInfo::Int { bounds: IntBounds { min: 0, bitlen: 19 } },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_decrementMs", 164, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_portraitId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_functionName", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_result", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_gameMenuItemIndex", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_purchaseCategoryId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_button", 79, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cutsceneId", 84, -2),
             ("m_bookmarkName", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cutsceneId", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cutsceneId", 84, -3),
             ("m_conversationLine", 20, -2),
             ("m_altConversationLine", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_cutsceneId", 84, -2),
             ("m_conversationLine", 20, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_leaveReason", 1, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_observe", 24, -7),
             ("m_name", 9, -6),
             ("m_toonHandle", 123, -5),
@@ -991,23 +987,23 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
     },
     TypeInfo::Optional { typeid: 96 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_state", 24, -2),
             ("m_sequence", 178, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_target", 93, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_target", 94, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_catalog", 10, -4),
             ("m_entry", 79, -3),
             ("m_field", 9, -2),
@@ -1015,39 +1011,39 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_index", 6, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_shown", 13, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_recipient", 12, -2),
             ("m_string", 30, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_recipient", 12, -2),
             ("m_point", 85, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_progress", 84, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_status", 24, -1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_scoreValueMineralsCurrent", 84, 0),
             ("m_scoreValueVespeneCurrent", 84, 1),
             ("m_scoreValueMineralsCollectionRate", 84, 2),
@@ -1090,13 +1086,13 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_playerId", 1, 0),
             ("m_stats", 189, 1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTagIndex", 6, 0),
             ("m_unitTagRecycle", 6, 1),
             ("m_unitTypeName", 29, 2),
@@ -1107,7 +1103,7 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTagIndex", 6, 0),
             ("m_unitTagRecycle", 6, 1),
             ("m_killerPlayerId", 59, 2),
@@ -1118,7 +1114,7 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTagIndex", 6, 0),
             ("m_unitTagRecycle", 6, 1),
             ("m_controlPlayerId", 1, 2),
@@ -1126,34 +1122,34 @@ pub static TYPEINFOS: &'static [TypeInfo] = &[
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTagIndex", 6, 0),
             ("m_unitTagRecycle", 6, 1),
             ("m_unitTypeName", 29, 2),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_playerId", 1, 0),
             ("m_upgradeTypeName", 29, 1),
             ("m_count", 84, 2),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_unitTagIndex", 6, 0),
             ("m_unitTagRecycle", 6, 1),
         ],
     },
-    TypeInfo::Array { bounds: (0, 10), typeid: 84 },
+    TypeInfo::Array { bounds: IntBounds { min: 0, bitlen: 10 }, typeid: 84 },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_firstUnitIndex", 6, 0),
             ("m_items", 197, 1),
         ],
     },
     TypeInfo::Struct {
-        items: &[
+        fields: &[
             ("m_playerId", 1, 0),
             ("m_type", 6, 1),
             ("m_userId", 43, 2),
